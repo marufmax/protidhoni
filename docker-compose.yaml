@@ -7,5 +7,6 @@ services:
     ports:
       - "8000:80"
       - "5173:5173" ## js dev
+      - "8080:8080" ## reverb
     volumes:
       - .:/app
