@@ -37,19 +37,16 @@ COPY . /app
 COPY ./php/local.ini /usr/local/etc/php/local.ini
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-WORKDIR /app/src
 
-# setup FE
-RUN npm install
-RUN npm rebuild node-sass
-RUN npm run dev
-
+RUN chmod +rwx /app/src
 ## setup BE
-RUN composer install --working-dir="/app"
-RUN composer dump-autoload --working-dir="/app"
+RUN composer install --working-dir="/app/src"
+RUN composer dump-autoload --working-dir="/app/src"
 
 EXPOSE 80
 
-RUN ["chmod", "+x", "post_deploy.sh"]
+RUN ["chmod", "+x", "./post_deploy.sh"]
 
 CMD [ "sh", "./post_deploy.sh" ]
+
+WORKDIR /app/src
