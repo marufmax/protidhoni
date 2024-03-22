@@ -6,7 +6,7 @@ RUN ["sh",  "./nodesource_setup.sh"]
 # Install environment dependencies
 RUN apt-get update \
 	# gd
-	&& apt-get install -y build-essential  openssl nginx libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs  \
+	&& apt-get install -y build-essential  openssl nginx libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server  \
 	&& docker-php-ext-configure gd  \
 	&& docker-php-ext-install gd \
 	# gmp
@@ -29,24 +29,22 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /tmp/pear/
 
-# setup composer and laravel
+# setup composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+RUN \
+  curl 'http://pecl.php.net/get/redis-6.0.2.tgz' -o /tmp/redis-6.0.2.tgz  \
+  && cd /tmp \
+  && pecl install redis-6.0.2.tgz \
+  && rm -rf redis-6.0.2.tgz \
+  && docker-php-ext-enable redis
+
 # Copy files
-COPY . /app
 COPY ./php/local.ini /usr/local/etc/php/local.ini
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./redis/redis.conf /etc/redis/redis.conf.default
 
+# Start services
+CMD ["sh", "-c", "nginx -g 'daemon off;' & redis-server && php-fpm"]
 
-RUN chmod +rwx /app/src
-## setup BE
-RUN composer install --working-dir="/app/src"
-RUN composer dump-autoload --working-dir="/app/src"
-
-EXPOSE 80
-
-RUN ["chmod", "+x", "./post_deploy.sh"]
-
-CMD [ "sh", "./post_deploy.sh" ]
-
-WORKDIR /app/src
+WORKDIR /app
