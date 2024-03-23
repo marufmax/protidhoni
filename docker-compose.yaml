@@ -4,9 +4,20 @@ services:
   app:
     build: docker/dev
     container_name: "protidhoni"
-    ports:
-      - "8000:80"
-      - "5173:5173" ## js dev
-      - "8080:8080" ## reverb
+    labels:
+      - "traefik.http.routers.app.rule=Host(`protidhoni.localhost`)"
+      - "traefik.enable=true"
+    depends_on:
+      - traefik
     volumes:
       - .:/app
+
+  traefik:
+    image: traefik:v2.11
+    container_name: "protidhoni-traefik"
+    command: --api.insecure=true --providers.docker
+    ports:
+      - "8080:8080"
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
