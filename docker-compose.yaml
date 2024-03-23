@@ -4,20 +4,40 @@ services:
   app:
     build: docker/dev
     container_name: "protidhoni"
+    ports:
+      - "80:80"
+      - "8090:8090"
+      - "8095:8095"
     labels:
-      - "traefik.http.routers.app.rule=Host(`protidhoni.localhost`)"
       - "traefik.enable=true"
-    depends_on:
-      - traefik
+      - "traefik.http.routers.app.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.app.entrypoints=ep1"
+
+      - "traefik.http.routers.reverb.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.reverb.entrypoints=ep2"
+      - "traefik.http.routers.reverb.service=reverb"
+      - "traefik.http.services.reverb.loadbalancer.server.port=8095"
+
+      - "traefik.http.routers.reverb-app.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.reverb-app.entrypoints=ep3"
+      - "traefik.http.routers.reverb-app.service=reverb-app"
+      - "traefik.http.services.reverb-app.loadbalancer.server.port=8090"
     volumes:
       - .:/app
 
-  traefik:
-    image: traefik:v2.11
-    container_name: "protidhoni-traefik"
-    command: --api.insecure=true --providers.docker
-    ports:
-      - "8080:8080"
-      - "80:80"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#  traefik:
+#    image: traefik:v2.11
+#    container_name: "protidhoni-traefik"
+#    command:
+#      - "--api.insecure=true"
+#      - "--providers.docker"
+#      - "--entrypoints.ep1.address=:80"
+#      - "--entrypoints.ep2.address=:8095"
+#      - "--entrypoints.ep3.address=:8090"
+#    ports:
+#      - "8080:8080"
+#      - "80:80"
+#      - "8090:8090"
+#      - "8095:8095"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
