@@ -8,6 +8,7 @@ services:
       - "80:80"
       - "8090:8090"
       - "8095:8095"
+      - "5173:5173"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app.rule=Host(`protidhoni.localhost`)"
@@ -24,6 +25,7 @@ services:
       - "traefik.http.services.reverb-app.loadbalancer.server.port=8090"
     volumes:
       - .:/app
+      - ../packages/:/packages
 
 #  traefik:
 #    image: traefik:v2.11

@@ -6,7 +6,7 @@ RUN ["sh",  "./nodesource_setup.sh"]
 # Install environment dependencies
 RUN apt-get update \
 	# gd
-	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server  \
+	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libicu-dev  libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server  \
 	&& docker-php-ext-configure gd  \
 	&& docker-php-ext-install gd \
 	# gmp
@@ -23,6 +23,7 @@ RUN apt-get update \
     && docker-php-ext-install sockets \
     && docker-php-ext-install pcntl \
     && docker-php-ext-install bcmath \
+    && docker-php-ext-install intl \
 	# zip
 	&& docker-php-ext-install zip \
 	&& apt-get autoclean -y \
