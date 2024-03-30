@@ -5,7 +5,97 @@ services:
     build: docker/dev
     container_name: "protidhoni"
     ports:
-      - "8000:80"
-      - "5173:5173" ## js dev
+      - "80:80"
+      - "8090:8090"
+      - "8095:8095"
+      - "5173:5173"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.app.entrypoints=ep1"
+
+      - "traefik.http.routers.reverb.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.reverb.entrypoints=ep2"
+      - "traefik.http.routers.reverb.service=reverb"
+      - "traefik.http.services.reverb.loadbalancer.server.port=8095"
+
+      - "traefik.http.routers.reverb-app.rule=Host(`protidhoni.localhost`)"
+      - "traefik.http.routers.reverb-app.entrypoints=ep3"
+      - "traefik.http.routers.reverb-app.service=reverb-app"
+      - "traefik.http.services.reverb-app.loadbalancer.server.port=8090"
     volumes:
       - .:/app
+      - ../packages/:/packages
+
+#  traefik:
+#    image: traefik:v2.11
+#    container_name: "protidhoni-traefik"
+#    command:
+#      - "--api.insecure=true"
+#      - "--providers.docker"
+#      - "--entrypoints.ep1.address=:80"
+#      - "--entrypoints.ep2.address=:8095"
+#      - "--entrypoints.ep3.address=:8090"
+#    ports:
+#      - "8080:8080"
+#      - "80:80"
+#      - "8090:8090"
+#      - "8095:8095"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
+
+  redpanda:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      # Address the broker advertises to clients that connect to the Kafka API.
+      # Use the internal addresses to connect to the Redpanda brokers'
+      # from inside the same Docker network.
+      # Use the external addresses to connect to the Redpanda brokers'
+      # from outside the Docker network.
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      # Address the broker advertises to clients that connect to the HTTP Proxy.
+      - --advertise-pandaproxy-addr internal://redpanda-0:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      # Redpanda brokers use the RPC API to communicate with each other internally.
+      - --rpc-addr redpanda:33145
+      - --advertise-rpc-addr redpanda:33145
+      # Mode dev-container uses well-known configuration properties for development in containers.
+      - --mode dev-container
+      # Tells Seastar (the framework Redpanda uses under the hood) to use 1 core on the system.
+      - --smp 1
+      - --default-log-level=info
+    image: docker.redpanda.com/redpandadata/redpanda:v23.3.10
+    container_name: redpanda
+    volumes:
+      - redpanda:/var/lib/redpanda/data
+    ports:
+      - "18081:18081"
+      - "18082:18082"
+      - "19092:19092"
+      - "19644:9644"
+  console:
+    container_name: redpanda-console
+    image: docker.redpanda.com/redpandadata/console:v2.4.5
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda:9092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda:9644"]
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redpanda
+volumes:
+  redpanda: null

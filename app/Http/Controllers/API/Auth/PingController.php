@@ -1,8 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api;
-
-use App\Http\Controllers\Controller;
+namespace App\Http\Controllers\API\Auth;
 
 class PingController
 {
