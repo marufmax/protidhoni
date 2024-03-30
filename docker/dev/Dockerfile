@@ -6,7 +6,7 @@ RUN ["sh",  "./nodesource_setup.sh"]
 # Install environment dependencies
 RUN apt-get update \
 	# gd
-	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libicu-dev  libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server  \
+	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libicu-dev  libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server librdkafka-dev  \
 	&& docker-php-ext-configure gd  \
 	&& docker-php-ext-install gd \
 	# gmp
@@ -40,6 +40,10 @@ RUN \
   && pecl install redis-6.0.2.tgz \
   && rm -rf redis-6.0.2.tgz \
   && docker-php-ext-enable redis
+
+## Kafka
+RUN pecl install rdkafka \
+    && docker-php-ext-enable rdkafka
 
 # copy files
 COPY ./php/local.ini /usr/local/etc/php/local.ini
