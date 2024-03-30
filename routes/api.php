@@ -16,4 +16,15 @@ Route::post('login', [LoginController::class, 'login']);
 Route::post('register', [LoginController::class, 'register']);
 
 ## Chat
+Route::post('messages/{receiver}', [\App\Http\Controllers\API\Chat\MessageController::class, 'send']);
 
+## Debug
+Route::post('/debug', static function (Request $request) {
+    $signature = "{$request->get('id')}:{$request->get('channel_name')}";
+
+   return hash_hmac(
+       'sha256',
+       $signature,
+       env('REVERB_APP_SECRET'),
+   );
+});

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use App\Notifications\UserLoggedIn;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -23,6 +24,7 @@ class LoginController extends Controller
         }
 
         $user = User::where(['email' => $request->get('email')])->firstOrFail();
+        $user->notify(new UserLoggedIn());
 
         return response()->json([
             'user' => [
