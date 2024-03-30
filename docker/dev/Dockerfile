@@ -6,7 +6,7 @@ RUN ["sh",  "./nodesource_setup.sh"]
 # Install environment dependencies
 RUN apt-get update \
 	# gd
-	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libicu-dev  libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server librdkafka-dev  \
+	&& apt-get install -y build-essential supervisor openssl nginx libfreetype6-dev libjpeg-dev libicu-dev  libpng-dev libwebp-dev zlib1g-dev libzip-dev gcc g++ make vim unzip curl git jpegoptim optipng pngquant gifsicle locales libonig-dev nodejs redis-server librdkafka-dev libsnappy-dev \
 	&& docker-php-ext-configure gd  \
 	&& docker-php-ext-install gd \
 	# gmp

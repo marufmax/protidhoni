@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\Login;
