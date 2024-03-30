@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\API\PingController;
+use App\Http\Controllers\API\Auth\LoginController;
+use App\Http\Controllers\API\Auth\PingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -9,4 +10,10 @@ Route::get('/user', static function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('ping', PingController::class);
-Route::post('login', [App\Http\Controllers\API\LoginController::class, 'create']);
+
+## Auth
+Route::post('login', [LoginController::class, 'login']);
+Route::post('register', [LoginController::class, 'register']);
+
+## Chat
+
