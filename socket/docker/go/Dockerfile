@@ -6,6 +6,7 @@ ENV APP_HOME /app/socket
 ENV GO111MODULE=on
 ENV GOFLAGS=-mod=vendor
 
+RUN apt update && apt install -y inetutils-ping
 
 RUN mkdir -p "$APP_HOME"
 
