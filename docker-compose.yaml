@@ -97,5 +97,13 @@ services:
       - "8080:8080"
     depends_on:
       - redpanda
+  websocket:
+    container_name: protidhoni-websocket
+    extends:
+      file: socket/docker-compose.yaml
+      service: websocket
+    ports:
+      - "9055:9055"
+
 volumes:
   redpanda: null
