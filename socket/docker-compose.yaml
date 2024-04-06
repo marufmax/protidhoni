@@ -6,3 +6,14 @@ services:
       context: docker/go
     volumes:
       - .:/app/socket
+  mqtt:
+    image: vernemq/vernemq
+    container_name: "mqtt"
+    ports:
+      - '1883:1883'
+      - '8888:8888'
+    volumes:
+      - ./docker/mqtt/vmq.acl:/etc/vernemq/vmq.acl
+    environment:
+      DOCKER_VERNEMQ_USER_admin: 'pass'
+      DOCKER_VERNEMQ_ACCEPT_EULA: "yes"

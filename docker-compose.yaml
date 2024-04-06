@@ -104,6 +104,11 @@ services:
       service: websocket
     ports:
       - "9055:9055"
+  mqtt:
+    extends:
+      file: socket/docker-compose.yaml
+      service: mqtt
+
 
 volumes:
   redpanda: null
