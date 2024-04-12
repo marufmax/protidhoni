@@ -14,4 +14,4 @@ RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh 
 
 WORKDIR $APP_HOME
 
-CMD ["air"]
+ENTRYPOINT ["air"]
