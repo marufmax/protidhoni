@@ -1,44 +1,32 @@
 package main
 
 import (
-	"fmt"
-	paho "github.com/eclipse/paho.mqtt.golang"
 	"marufalom.com/websocket/internal/api"
+	"marufalom.com/websocket/internal/mqtt"
 )
 
 type webapp struct {
-	app *api.API
+	Api  *api.API
+	Mqtt *mqtt.MQTT
 }
+
+var App webapp
 
 func main() {
-	setupMQTT()
-	setupApi()
-}
-
-func setupApi() {
-	app := api.NewApi()
-	app.StartServer(9055)
-}
-
-func setupMQTT() {
-	opts := paho.NewClientOptions()
-	opts.AddBroker("tcp://mqtt:1883")
-	opts.SetUsername("admin")
-	opts.SetPassword("pass")
-	opts.OnConnect = connectHandler
-	opts.OnConnectionLost = connectionLostHandler
-
-	client := paho.NewClient(opts)
-
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+	App = webapp{
+		Api:  setupApi(),
+		Mqtt: setupMQTT(),
 	}
+	App.Api.StartServer(9055)
+	App.Mqtt.StartServer()
 }
 
-var connectHandler paho.OnConnectHandler = func(client paho.Client) {
-	fmt.Println("Connected")
+func setupApi() *api.API {
+	app := api.NewApi()
+
+	return app
 }
 
-var connectionLostHandler paho.ConnectionLostHandler = func(client paho.Client, err error) {
-	fmt.Printf("Connection Lost: %s\n", err.Error())
+func setupMQTT() *mqtt.MQTT {
+	return mqtt.NewMQTT()
 }
